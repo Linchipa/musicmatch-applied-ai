@@ -17,17 +17,25 @@ Replace this paragraph with your own summary of what your version does.
 
 ## How The System Works
 
-Explain your design in plain language.
+This simulation uses **content-based filtering** — the system compares each song's attributes (genre, mood, energy) directly against a user's taste profile to find the best matches.
 
-Some prompts to answer:
+Real platforms like Spotify combine this with collaborative filtering ("users like you also liked..."), which requires data from millions of users. Our version keeps it simple and focuses purely on song-to-preference matching.
 
-- What features does each `Song` use in your system
-  - For example: genre, mood, energy, tempo
-- What information does your `UserProfile` store
-- How does your `Recommender` compute a score for each song
-- How do you choose which songs to recommend
+**Data flow:**
+User preferences → score every song → sort by score → return top 5
 
-You can include a simple diagram or bullet list if helpful.
+**Features each Song uses:** genre, mood, energy, acousticness
+
+**What UserProfile stores:** favorite genre, favorite mood, target energy level, whether they like acoustic sound
+
+**Scoring rules (Algorithm Recipe):**
+- Genre matches user's favorite → +3.0 points
+- Mood matches user's favorite → +2.0 points
+- Energy is close to user's target → up to +1.0 point (scales down the further away it is)
+- Song is acoustic and user likes acoustic → +0.5 points
+- Maximum possible score: 6.5 points (perfect match on everything)
+
+**Known data bias:** The starting dataset has 3 lofi songs and only 1 each of jazz and rock — so the system will naturally have more variety for lofi users than for others.
 
 ---
 
