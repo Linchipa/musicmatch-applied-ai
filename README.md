@@ -168,7 +168,7 @@ I also learned that reliability requires thinking about failure. What happens wh
 
 ## Demo Walkthrough
 
-[Add Loom video link here after recording]
+[Watch Demo Walkthrough](https://youtu.be/d-5kQIyAZBI)
 
 ---
 
