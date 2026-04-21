@@ -18,6 +18,8 @@ MusicMatch looks at four key attributes of each song: genre, mood, energy level,
 
 Every song in the catalog competes for the highest score. Once all songs are scored, they are ranked from highest to lowest and the top 5 are presented to the user along with the reasons why each song was recommended.
 
+In the final project version, a second AI layer was added on top of this scoring engine. After the top 5 songs are selected, the results are sent to Google Gemini along with the user's full taste profile. Gemini generates a friendly, conversational paragraph that explains the recommendations in plain language — like a knowledgeable friend rather than a calculator. Input validation runs before any scoring begins, and every recommendation session is logged to a file with a confidence percentage showing how strong the top match was.
+
 ---
 
 ## 4. Data  
@@ -64,7 +66,27 @@ Second, adding more scoring metrics would make recommendations more accurate. Fe
 
 Third, the system could address the filter bubble problem by occasionally introducing songs from outside the user's preferred genre when the mood and energy are a strong match. This would encourage discovery rather than always reinforcing the same taste.
 
-Finally, the biggest improvement would be adding a friendly virtual music personality that communicates recommendations in a warm and personal way. Instead of displaying raw scores and labels, the system would talk to the user like a knowledgeable friend saying things like "I know you love rock but this jazz track has the same intensity you might enjoy" or "This artist just dropped something new that fits your vibe perfectly." This would make the experience feel less like a calculator and more like a real recommendation from someone who understands your taste.
+Finally, adding a user-facing interface — such as a simple web form — would make MusicMatch accessible to people who are not comfortable running Python from the command line. The current CLI-only design limits who can actually use the system.
+
+---
+
+## 10. AI Collaboration
+
+**How AI was used during this project**
+
+Claude (Anthropic's AI coding assistant) was used throughout the development of this final project as a collaborative partner. It helped design the structure of `ai_explainer.py`, write the Gemini prompt, implement input validation in `guardrails.py`, and wire all the components together in `main.py`. Rather than just generating code, Claude explained what each piece did and why before writing it, which helped with understanding the design decisions behind the system.
+
+**One helpful suggestion**
+
+The most helpful suggestion was the structure of the Gemini prompt in `ai_explainer.py`. Claude recommended including not just the song titles but also the specific reasons each song scored well (genre match, mood match, energy closeness) so that Gemini had enough context to generate a specific and accurate response. Without those reasons in the prompt, Gemini would produce generic music commentary instead of a personalized explanation tied to the actual recommendations.
+
+**One flawed suggestion**
+
+Early in the project, Claude recommended using the Anthropic API (Claude's own API) instead of Google Gemini. This was incorrect for this course — CodePath AI110 uses Gemini throughout, and students already had Gemini API keys set up from Module 4. Following Claude's suggestion led to confusion about API keys and wasted time before the instructor clarified that Gemini was the right choice. This was a reminder that AI assistants can be confidently wrong, and checking suggestions against course requirements or asking an instructor is always worth doing.
+
+**What this taught me about AI collaboration**
+
+Working with an AI assistant is not the same as having the AI do the work. The best results came from understanding each suggestion before accepting it, asking why before saying yes, and catching mistakes early — like the wrong API recommendation — rather than blindly following along. AI is a powerful tool but it requires an informed human in the loop to catch errors and make final decisions.
 
 ---
 

@@ -1,219 +1,177 @@
-# 🎵 Music Recommender Simulation
+# MusicMatch Applied AI System
 
-## Project Summary
-
-In this project you will build and explain a small music recommender system.
-
-Your goal is to:
-
-- Represent songs and a user "taste profile" as data
-- Design a scoring rule that turns that data into recommendations
-- Evaluate what your system gets right and wrong
-- Reflect on how this mirrors real world AI recommenders
-
-Replace this paragraph with your own summary of what your version does.
+A content-based music recommender extended with Gemini AI to deliver friendly, personalized song explanations. Built as the final project for CodePath AI110.
 
 ---
 
-## How The System Works
+## Base Project
 
-This simulation uses **content-based filtering** — the system compares each song's attributes (genre, mood, energy) directly against a user's taste profile to find the best matches.
+This project extends **MusicMatch**, originally built in Module 3 of CodePath AI110. The original system used a pure Python scoring algorithm to recommend songs from a 30-song catalog based on a user's preferred genre, mood, energy level, and acoustic preference. It scored each song out of 6.5 points and returned the top 5 matches with raw scores and reasons. This final version keeps that scoring engine and adds a Gemini AI layer, input guardrails, confidence scoring, and logging on top of it.
 
-Real platforms like Spotify combine this with collaborative filtering ("users like you also liked..."), which requires data from millions of users. Our version keeps it simple and focuses purely on song-to-preference matching.
-
-**Data flow:**
-User preferences → score every song → sort by score → return top 5
-
-**Features each Song uses:** genre, mood, energy, acousticness
-
-**What UserProfile stores:** favorite genre, favorite mood, target energy level, whether they like acoustic sound
-
-**Scoring rules (Algorithm Recipe):**
-- Genre matches user's favorite → +3.0 points
-- Mood matches user's favorite → +2.0 points
-- Energy is close to user's target → up to +1.0 point (scales down the further away it is)
-- Song is acoustic and user likes acoustic → +0.5 points
-- Maximum possible score: 6.5 points (perfect match on everything)
-
-**Known data bias:** The starting dataset has 3 lofi songs and only 1 each of jazz and rock — so the system will naturally have more variety for lofi users than for others.
+Original repo: https://github.com/Linchipa/ai110-module3show-musicrecommendersimulation-starter
 
 ---
 
-## Getting Started
+## What This System Does
 
-### Setup
+MusicMatch takes a user's music taste profile and:
 
-1. Create a virtual environment (optional but recommended):
+1. Validates the input before running anything
+2. Scores every song in the catalog using a weighted algorithm
+3. Returns the top 5 matches with confidence percentages
+4. Sends the results to Gemini AI, which responds like a knowledgeable music friend
+5. Logs every run to a file for reliability tracking
 
-   ```bash
-   python -m venv .venv
-   source .venv/bin/activate      # Mac or Linux
-   .venv\Scripts\activate         # Windows
+---
 
-2. Install dependencies
+## Architecture Overview
 
+![System Diagram](assets/system_diagram.png)
+
+The system flows in one direction: user profile → validation → recommender → AI explainer → output. Two things happen in parallel at the end: Gemini generates the friendly response, and the logger records the run. If the input is invalid, the system catches it early and skips that profile without crashing.
+
+**Key components:**
+- `src/recommender.py` — scoring engine (content-based filtering)
+- `src/guardrails.py` — input validation, confidence scoring, logging
+- `src/ai_explainer.py` — Gemini AI integration
+- `src/main.py` — orchestrates the full pipeline
+- `data/songs.csv` — 30-song catalog across 10 genres
+- `logs/musicmatch.log` — runtime log file
+
+---
+
+## Setup Instructions
+
+**1. Clone the repo**
+```bash
+git clone https://github.com/Linchipa/musicmatch-applied-ai.git
+cd musicmatch-applied-ai
+```
+
+**2. Create a virtual environment (recommended)**
+```bash
+python -m venv .venv
+.venv\Scripts\activate      # Windows
+source .venv/bin/activate   # Mac/Linux
+```
+
+**3. Install dependencies**
 ```bash
 pip install -r requirements.txt
 ```
 
-3. Run the app:
+**4. Set up your API key**
 
+Create a `.env` file in the project root:
+```
+GEMINI_API_KEY=your_key_here
+```
+
+Get a free Gemini API key at: https://aistudio.google.com/app/api-keys
+
+**5. Run the system**
 ```bash
 python -m src.main
 ```
 
-### Running Tests
-
-Run the starter tests with:
-
+**6. Run tests**
 ```bash
 pytest
 ```
 
-You can add more tests in `tests/test_recommender.py`.
+---
+
+## Sample Interactions
+
+### Profile 1 — Chill Lofi
+**Input:** genre=lofi, mood=chill, energy=0.35, likes_acoustic=True
+
+**Top matches:**
+```
+Library Rain by Paper Lanterns  — Score: 6.43 | Confidence: 99%
+Midnight Coding by LoRoom       — Score: 6.43 | Confidence: 99%
+Focus Flow by LoRoom            — Score: 4.45 | Confidence: 68%
+```
+
+**MusicMatch says:**
+> Hey there! So glad you're diving into the world of lofi — it's seriously the perfect vibe for a chill afternoon! I've been loving Library Rain by Paper Lanterns, it's got that beautiful, dreamy quality that's super relaxing. Midnight Coding by LoRoom is another fantastic choice — it's got that focused energy without being too intense. Let me know if you want to explore more lofi tracks!
 
 ---
 
-## Experiments You Tried
+### Profile 2 — Pop/Happy
+**Input:** genre=pop, mood=happy, energy=0.8, likes_acoustic=False
 
-Use this section to document the experiments you ran. For example:
+**Top matches:**
+```
+Sunrise City by Neon Echo   — Score: 5.98 | Confidence: 92%
+Gym Hero by Max Pulse       — Score: 4.93 | Confidence: 76%
+Golden Hour by Neon Echo    — Score: 3.97 | Confidence: 61%
+```
 
-- What happened when you changed the weight on genre from 2.0 to 0.5
-- What happened when you added tempo or valence to the score
-- How did your system behave for different types of users
+**MusicMatch says:**
+> You've got great taste in upbeat pop! Sunrise City by Neon Echo is your perfect match — the energy is right in your sweet spot and the happy mood is spot on. Gym Hero brings that same high energy if you want something more intense. Golden Hour is a slightly more relaxed pop pick to round out your playlist.
 
 ---
 
-## Limitations and Risks
+### Profile 3 — Intense Rock
+**Input:** genre=rock, mood=intense, energy=0.9, likes_acoustic=False
 
-Summarize some limitations of your recommender.
+**Top matches:**
+```
+Storm Runner by Voltline    — Score: 5.99 | Confidence: 92%
+Broken Neon by Voltline     — Score: 3.82 | Confidence: 59%
+Mountain Echo by Voltline   — Score: 3.58 | Confidence: 55%
+```
 
-Examples:
+**MusicMatch says:**
+> If you're looking for high-energy rock, Storm Runner by Voltline is exactly what you need — it nails your genre, mood, and energy all at once. Broken Neon has that same raw Voltline sound with a moodier edge. Mountain Echo rounds things out with a slightly more atmospheric rock feel.
 
-- It only works on a tiny catalog
-- It does not understand lyrics or language
-- It might over favor one genre or mood
+---
 
-You will go deeper on this in your model card.
+## Design Decisions
+
+**Why content-based filtering?**
+Content-based filtering scores each song directly against the user's stated preferences. It is transparent — you can see exactly why each song was recommended — and it works without needing data from other users. The trade-off is it cannot discover songs the user wouldn't think to ask for.
+
+**Why genre is weighted highest (+3.0)**
+Genre is the strongest predictor of whether someone will enjoy a song. A rock fan rarely enjoys jazz even if the mood matches. Weighting genre at +3.0 (vs. mood at +2.0) reflects this.
+
+**Why Gemini instead of showing raw scores**
+Raw scores like "5.98" are not meaningful to most users. Gemini translates those numbers into a conversational response that explains the recommendation in human terms, making the system feel approachable rather than mechanical.
+
+**Why guardrails before the recommender runs**
+Catching bad input early prevents confusing results. If a user sets energy to 5.0 or types an unrecognized genre, the system should explain the problem clearly rather than returning nonsense recommendations.
+
+---
+
+## Testing Summary
+
+- **Unit tests** (`pytest`) cover the `Recommender` class — sorting by score and generating non-empty explanations. Both pass.
+- **Input validation** was tested with invalid genre, out-of-range energy, and wrong data types — all caught correctly with clear error messages.
+- **Confidence scoring** was verified: a perfect score of 6.5 returns 100%, a score of 5.99 returns 92%.
+- **Logging** was confirmed by checking `logs/musicmatch.log` after each run — entries appear correctly with timestamp, user profile, top pick, and confidence.
+- **AI responses** were reviewed across all 3 profiles — Gemini consistently produced friendly, specific, on-topic paragraphs.
+
+One limitation found during testing: the free tier of the Gemini API has rate limits. Running the system many times quickly will trigger a temporary block. The 10-second delay between profiles reduces this risk.
 
 ---
 
 ## Reflection
 
-Read and complete `model_card.md`:
+Building MusicMatch into a full applied AI system taught me that adding AI to a project is not just about making it smarter — it is about making it more human. The scoring algorithm was already working well, but the raw output felt cold. Connecting it to Gemini changed the experience entirely.
 
-[**Model Card**](model_card.md)
+The biggest challenge was not the code — it was understanding what the AI needed to know to give a good answer. Writing a clear prompt that gave Gemini the right context (the user's profile, the song list, the reasons for each match) made the difference between a generic response and one that felt genuinely helpful.
 
-Write 1 to 2 paragraphs here about what you learned:
-
-- about how recommenders turn data into predictions
-- about where bias or unfairness could show up in systems like this
-
+I also learned that reliability requires thinking about failure. What happens when the input is wrong? What happens when the API is unavailable? Building guardrails and fallback messages made the system trustworthy, not just functional.
 
 ---
 
-## 7. `model_card_template.md`
+## Demo Walkthrough
 
-Combines reflection and model card framing from the Module 3 guidance. :contentReference[oaicite:2]{index=2}  
-
-```markdown
-# 🎧 Model Card - Music Recommender Simulation
-
-## 1. Model Name
-
-Give your recommender a name, for example:
-
-> VibeFinder 1.0
+[Add Loom video link here after recording]
 
 ---
 
-## 2. Intended Use
+## Repository
 
-- What is this system trying to do
-- Who is it for
-
-Example:
-
-> This model suggests 3 to 5 songs from a small catalog based on a user's preferred genre, mood, and energy level. It is for classroom exploration only, not for real users.
-
----
-
-## 3. How It Works (Short Explanation)
-
-Describe your scoring logic in plain language.
-
-- What features of each song does it consider
-- What information about the user does it use
-- How does it turn those into a number
-
-Try to avoid code in this section, treat it like an explanation to a non programmer.
-
----
-
-## 4. Data
-
-Describe your dataset.
-
-- How many songs are in `data/songs.csv`
-- Did you add or remove any songs
-- What kinds of genres or moods are represented
-- Whose taste does this data mostly reflect
-
----
-
-## 5. Strengths
-
-Where does your recommender work well
-
-You can think about:
-- Situations where the top results "felt right"
-- Particular user profiles it served well
-- Simplicity or transparency benefits
-
----
-
-## 6. Limitations and Bias
-
-Where does your recommender struggle
-
-Some prompts:
-- Does it ignore some genres or moods
-- Does it treat all users as if they have the same taste shape
-- Is it biased toward high energy or one genre by default
-- How could this be unfair if used in a real product
-
----
-
-## 7. Evaluation
-
-How did you check your system
-
-Examples:
-- You tried multiple user profiles and wrote down whether the results matched your expectations
-- You compared your simulation to what a real app like Spotify or YouTube tends to recommend
-- You wrote tests for your scoring logic
-
-You do not need a numeric metric, but if you used one, explain what it measures.
-
----
-
-## 8. Future Work
-
-If you had more time, how would you improve this recommender
-
-Examples:
-
-- Add support for multiple users and "group vibe" recommendations
-- Balance diversity of songs instead of always picking the closest match
-- Use more features, like tempo ranges or lyric themes
-
----
-
-## 9. Personal Reflection
-
-A few sentences about what you learned:
-
-- What surprised you about how your system behaved
-- How did building this change how you think about real music recommenders
-- Where do you think human judgment still matters, even if the model seems "smart"
-
+GitHub: https://github.com/Linchipa/musicmatch-applied-ai

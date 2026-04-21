@@ -39,12 +39,37 @@ class Recommender:
         self.songs = songs
 
     def recommend(self, user: UserProfile, k: int = 5) -> List[Song]:
-        # TODO: Implement recommendation logic
-        return self.songs[:k]
+        def score(song: Song) -> float:
+            s = 0.0
+            if song.genre == user.favorite_genre:
+                s += 3.0
+            if song.mood == user.favorite_mood:
+                s += 2.0
+            energy_score = round(1.0 - abs(song.energy - user.target_energy), 2)
+            if energy_score > 0:
+                s += energy_score
+            if user.likes_acoustic and song.acousticness >= 0.5:
+                s += 0.5
+            return s
+
+        return sorted(self.songs, key=score, reverse=True)[:k]
 
     def explain_recommendation(self, user: UserProfile, song: Song) -> str:
-        # TODO: Implement explanation logic
-        return "Explanation placeholder"
+        reasons = []
+        if song.genre == user.favorite_genre:
+            reasons.append("genre match")
+        if song.mood == user.favorite_mood:
+            reasons.append("mood match")
+        energy_gap = abs(song.energy - user.target_energy)
+        if energy_gap <= 0.2:
+            reasons.append("energy is a close fit")
+        elif energy_gap <= 0.5:
+            reasons.append("energy is a decent match")
+        if user.likes_acoustic and song.acousticness >= 0.5:
+            reasons.append("acoustic sound")
+        if reasons:
+            return f"{song.title} by {song.artist} matches because: {', '.join(reasons)}."
+        return f"{song.title} by {song.artist} is a partial match based on overall profile similarity."
 
 def load_songs(csv_path: str) -> List[Dict]:
     """Loads songs from a CSV file and returns them as a list of dictionaries."""
