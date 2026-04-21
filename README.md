@@ -160,7 +160,7 @@ One limitation found during testing: the free tier of the Gemini API has rate li
 
 Building MusicMatch into a full applied AI system taught me that adding AI to a project is not just about making it smarter — it is about making it more human. The scoring algorithm was already working well, but the raw output felt cold. Connecting it to Gemini changed the experience entirely.
 
-The biggest challenge was not the code — it was understanding what the AI needed to know to give a good answer. Writing a clear prompt that gave Gemini the right context (the user's profile, the song list, the reasons for each match) made the difference between a generic response and one that felt genuinely helpful.
+The biggest challenge was not the code,  it was understanding what the AI needed to know to give a good answer. Writing a clear prompt that gave Gemini the right context (the user's profile, the song list, the reasons for each match) made the difference between a generic response and one that felt genuinely helpful.
 
 I also learned that reliability requires thinking about failure. What happens when the input is wrong? What happens when the API is unavailable? Building guardrails and fallback messages made the system trustworthy, not just functional.
 
@@ -169,6 +169,12 @@ I also learned that reliability requires thinking about failure. What happens wh
 ## Demo Walkthrough
 
 [Watch Demo Walkthrough](https://youtu.be/d-5kQIyAZBI)
+
+---
+
+## Portfolio Reflection
+
+As an AI engineer, my main responsibility is not just writing code, it is being an architect. That means understanding how each component of a system fits together, where it is strong, and where it can fail. This project pushed me to apply that thinking in a real way. I started with a simple scoring algorithm and extended it into a full AI-integrated system with input validation, confidence scoring, logging, and natural language responses powered by Gemini. Building MusicMatch taught me that adding AI to a product is not just a technical decision, it is a design decision. You have to think about what the AI needs to know, when to trust it, and what happens when it gets things wrong. These are skills that matter deeply in today's tech landscape, where AI is becoming part of almost every product being built.
 
 ---
 
